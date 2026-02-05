@@ -1,0 +1,59 @@
+
+    
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.15.0
+    container_name: qwen-vllm
+    gpus: all
+
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+
+    ports:
+      - "8001:8000"
+
+    command: >
+      --model Qwen/Qwen3-VL-2B-Instruct
+      --max-model-len 2000
+      --gpu-memory-utilization 0.8
+      --max-num-seqs 1
+      --enable-chunked-prefill
+
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  api:
+    container_name: diagram-analyzer
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+
+    depends_on:
+      vllm:
+        condition: service_healthy
+
+    environment:
+      OPENAI_BASE_URL: http://vllm:8000/v1
+      OPENAI_API_KEY: dummy
+      PYTHONPATH: /app
+
+    volumes:
+      - ./data:/app/data
+
+    ports:
+      - "8000:8000"
+
+    command: >
+      uvicorn main:app --host 0.0.0.0 --port 8000

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Algorithm to diagram</h2>
+
+<div class="card">
+    <form id="upload-form">
+        <input type="file" id="file" accept=".csv" required>
+        <br><br>
+        <button type="submit">Generate diagram</button>
+    </form>
+</div>
+
+<div class="card" id="status" style="display:none;">
+    <b>Status:</b> <span id="task-status"></span>
+</div>
+
+<div class="card" id="result" style="display:none;">
+    <h3>Generated diagram</h3>
+    <img id="result-image" style="max-width:100%;">
+</div>
+
+<script>
+document.getElementById("upload-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("file");
+
+    if (!fileInput.files.length) {
+        alert("Select a CSV file");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const response = await fetch("/api/upload-csv", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await response.json();
+
+    document.getElementById("status").style.display = "block";
+    document.getElementById("task-status").textContent = "done";
+
+    document.getElementById("result").style.display = "block";
+    document.getElementById("result-image").src =
+        `data:image/png;base64,${data.result.png_base64}`;
+});
+</script>
+{% endblock %}

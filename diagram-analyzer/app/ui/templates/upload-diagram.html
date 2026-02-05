@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Diagram to algorithm</h2>
+
+<div class="card">
+    <form id="upload-form">
+        <input
+            type="file"
+            id="file"
+            required
+        >
+        <br><br>
+        <button type="submit">Analyze</button>
+    </form>
+</div>
+
+<div class="card" id="status" style="display:none;">
+    <b>Status:</b> <span id="task-status"></span>
+</div>
+
+<div class="card" id="result" style="display:none;">
+    <h3>Result</h3>
+    <pre id="result-text"></pre>
+</div>
+
+<script>
+document.getElementById("upload-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("file");
+
+    if (!fileInput.files.length) {
+        alert("Select a file");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const response = await fetch("/api/upload-diagram", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await response.json();
+
+    document.getElementById("status").style.display = "block";
+    document.getElementById("task-status").textContent = "done";
+
+    document.getElementById("result").style.display = "block";
+    document.getElementById("result-text").textContent =
+        data.result?.raw || JSON.stringify(data.result, null, 2);
+});
+</script>
+{% endblock %}

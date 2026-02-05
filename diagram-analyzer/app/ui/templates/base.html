@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Diagram Analyzer" }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <nav>
+        <a href="/">Home</a>
+        <a href="/upload-diagram">Diagram to algorithm</a>
+        <a href="/upload-csv">Algorithm to diagram</a>
+    </nav>
+
+    <hr>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        Argo © {{ year or 2026 }}
+    </footer>
+</div>
+
+</body>
+</html>
