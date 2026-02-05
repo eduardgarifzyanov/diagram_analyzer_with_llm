@@ -113,7 +113,45 @@ docker compose up --build
 
 ---
 
-## Локальный запуск
+## Автоматическая сборка (build.sh)
+
+В проекте предусмотрен скрипт деплоя **build.sh**, который полностью пересобирает и запускает сервис через Docker Compose:
+
+```bash
+#!/bin/bash
+cd diagram-analyzer
+
+set -e
+
+echo "Stopping old containers..."
+docker compose down -v || true
+
+echo "Pulling latest images..."
+docker compose pull
+
+echo "Building and starting services..."
+docker compose up --build
+```
+
+Что делает скрипт:
+
+1. Переходит в директорию проекта
+2. Останавливает и удаляет старые контейнеры и тома
+3. Подтягивает актуальные образы
+4. Пересобирает и запускает сервисы
+
+Запуск:
+
+```bash
+chmod +x build.sh
+./build.sh
+```
+
+Рекомендуется использовать этот способ для **production-обновлений** и быстрого развёртывания на сервере.
+
+---
+
+## Лок
 
 ```bash
 pip install -r requirements.txt
